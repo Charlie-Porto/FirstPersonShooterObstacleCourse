@@ -86,6 +86,7 @@ int main(int argc, const char * argv[]) {
     Signature player_mvmt_sig;
     player_mvmt_sig.set(control.GetComponentType<pce::Motion>());
     player_mvmt_sig.set(control.GetComponentType<pce::Orientation>());
+    player_mvmt_sig.set(control.GetComponentType<pce::Joystick>());
     control.SetSystemSignature<pce::PlayerMovementSystem>(player_mvmt_sig);
 
     auto physics_system = control.RegisterSystem<pce::PhysicsSystem>();
@@ -122,6 +123,7 @@ int main(int argc, const char * argv[]) {
 
     auto screen_map_system = control.RegisterSystem<pce::ScreenMapSystem>();
     Signature screen_map_sig;
+    screen_map_sig.set(control.GetComponentType<pce::Orientation>());
     control.SetSystemSignature<pce::ScreenMapSystem>(screen_map_sig);
 
 
@@ -162,9 +164,13 @@ int main(int argc, const char * argv[]) {
         
         /* SDL events and updating */ 
         int frameStart = SDL_GetTicks();       
+        // auto* const handle_events = &simulation->handleEvents;
         simulation->handleEvents();
         simulation->update();
         simulation->clearRenderer();
+        // std::thread thread_b(&simulation->clearRenderer);
+        // thread_b.join();
+        
 
         double t = frameStart/1000.0;
 
@@ -179,22 +185,27 @@ int main(int argc, const char * argv[]) {
         auto cam_pos = camera_system->ProvideCamPosition();
 
         double ticks = (SDL_GetTicks()/1000.0);
-        joystick_system->UpdateEntities(ticks);
-        player_movement_system->UpdateEntities(ticks);
-        physics_system->UpdateEntities(ticks);
-        camera_system->UpdateCamera();
+        // joystick_system->UpdateEntities(ticks);
+        std::thread thread_a([ticks, joystick_system, player_movement_system,
+                              physics_system, camera_system](){
+            joystick_system->UpdateEntities(ticks);
+            player_movement_system->UpdateEntities(ticks);
+            physics_system->UpdateEntities(ticks);
+            camera_system->UpdateCamera();
+        });
 
         /*~~~~~~~~~-------------- Detect, Draw and Render --------------------*/
-        // position_transform_system->UpdateEntities(camera_system->ProvideCamTransformVector(),
-        //                                           camera_system->ProvideCamVersor(),
-        //                                           camera_system->ProvideCamPosition());
-        position_transform_system->UpdateEntities(cam_transform_vector,
-                                                  cam_versor, cam_pos);
-        radar_system->UpdateEntities();
-        block_render_system->UpdateEntities(cam_transform_vector, cam_versor);
+        std::thread thread_b([cam_versor, cam_pos, cam_transform_vector,
+                              position_transform_system, radar_system, block_render_system]() {
+            position_transform_system->UpdateEntities(cam_transform_vector, cam_versor, cam_pos);
+            radar_system->UpdateEntities();
+            block_render_system->UpdateEntities(cam_transform_vector, cam_versor);
+        });
+        thread_a.join();
+        thread_b.join();
+
+
         screen_map_system->UpdateEntities();
-
-
 
         /*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
         simulation->render();
@@ -205,8 +216,7 @@ int main(int argc, const char * argv[]) {
         /* check how much time has passed during frame */
         frameTime = SDL_GetTicks() - frameStart;
 
-        /* if frame too fast, delay the frame */
-        if ( frameDelay > frameTime )
+        /* if frame too fast, delay the frame */ if ( frameDelay > frameTime )
         {
             SDL_Delay( frameDelay - frameTime );
         }
