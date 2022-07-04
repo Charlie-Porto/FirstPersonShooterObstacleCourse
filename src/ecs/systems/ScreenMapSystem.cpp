@@ -11,6 +11,7 @@ system to produce the screen map (common feature of first person shooters)
 #include <ezprint.cpp>
 #include "../System.cpp"
 #include "subsystems/simpleDrawingFunctions.cpp"
+#include "screenMapFunctions.cpp"
 
 extern ControlPanel control;
 
@@ -32,12 +33,15 @@ void DrawScreenMap() {
 
 
 void UpdateEntities() {
+  DrawScreenMap();
+  // screen_map::drawMapCenter();
   for (auto const& entity : entities) {
     auto const& orientation = control.GetComponent<pce::Orientation>(entity);
 
     /* draw 2d-converted position on map */
-
-    DrawScreenMap();
+    const glm::dvec2 map_position = pce::screen_map::convertActualCoordinatesToScreenMap(orientation.position);
+    vezp::print_labeled_dvec2("map_position", map_position);
+    pce::quickdraw::drawCircleAtVec2(map_position, {255, 255, 255, 255}, 1.0);
   }
 }
 

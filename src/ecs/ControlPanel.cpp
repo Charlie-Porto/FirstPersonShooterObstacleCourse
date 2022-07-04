@@ -11,12 +11,12 @@
 class ControlPanel
 {
 public:
-    void Init()
-    {
-        mEntityManager = std::make_unique<EntityMgr>();
-        mComponentManager = std::make_unique<ComponentMgr>();
-        mSystemManager = std::make_unique<SystemMgr>();
-    }
+	void Init()
+	{
+			mEntityManager = std::make_unique<EntityMgr>();
+			mComponentManager = std::make_unique<ComponentMgr>();
+			mSystemManager = std::make_unique<SystemMgr>();
+	}
     // Entity methods
 	Entity CreateEntity()
 	{

@@ -99,6 +99,11 @@ void drawCircleAtVec2(const glm::vec2& point, const std::vector<int>& color, dou
   drawCircle(sdl_transform.x, sdl_transform.y, int(radius), color, Simulation::renderer);
 }
 
+void drawCircleAtRawVec2(const glm::vec2& point, const std::vector<int>& color, double radius) {
+  drawCircle(point.x, point.y, int(radius), color, Simulation::renderer);
+}
+
+
 const std::vector<glm::dvec2> crosshair_points = {
   glm::dvec2(0, 0),
   glm::dvec2(0, 1),
