@@ -35,6 +35,24 @@ glm::vec2 ConvertCartesianCoordinatesToSDL(glm::vec2 point) {
   return glm::vec2(sdl_x, sdl_y);
 }
 
+void drawMapSquare(const glm::dvec2& point, int w, std::vector<int> color) {
+  drawSquare(point.x, point.y, w, color, Simulation::renderer);
+}
+
+
+void drawRect(const glm::dvec2& point, int x_len, int y_len, std::vector<int> color) {
+  SDL_Rect rect;
+  rect.x = point.x;
+  rect.y = point.y;
+  rect.h = y_len;
+  rect.w = x_len;
+
+  SDL_SetRenderDrawColor(Simulation::renderer, color[0], color[1], color[2], color[3]);
+  SDL_RenderDrawRect(Simulation::renderer, &rect);
+  SDL_SetRenderDrawColor(Simulation::renderer, 0, 0, 0, 250);
+}
+
+
 void drawLine(glm::dvec2 point_a_transform, glm::dvec2 point_b_transform) {
   SDL_SetRenderDrawColor(Simulation::renderer, 255, 202, 170, 255);
   glm::dvec2 a_sdl_coordinates = ConvertCartesianCoordinatesToSDL(

@@ -17,6 +17,7 @@ public:
 PlayerMovementSystem() {
   current_time_ = 0.0;
   time_change_ = 0.0;
+  if_mouse_moved = false;
 }
 
 void UpdateEntities(double sdl_time) {
@@ -29,8 +30,13 @@ void UpdateEntities(double sdl_time) {
     auto& orientation = control.GetComponent<pce::Orientation>(entity);
     orientation.previous_position = orientation.position;
     pce::motion::updatePositionBasedOnJoystickReport(joystick.keyboard_report, orientation, motion);
-    pce::motion::updateViewDirectionViaMouseReport(joystick.mouse_report, orientation);
-    // vezp::print_labeled_dvec3("position: ", orientation.position);
+
+    /* control for mouse re-centering */
+    if (!if_mouse_moved) {
+      if_mouse_moved = pce::motion::updateViewDirectionViaMouseReport(joystick.mouse_report, orientation);
+    } else {
+      if_mouse_moved = false;
+    }
     
   }
 }
@@ -38,6 +44,7 @@ void UpdateEntities(double sdl_time) {
 private:
   double current_time_;
   double time_change_;
+  bool if_mouse_moved;
   
  
 };

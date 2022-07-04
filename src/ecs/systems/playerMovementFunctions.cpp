@@ -59,16 +59,25 @@ void movePlayerLaterally(pce::Orientation& orientation, const glm::dvec3 directi
   orientation.position += movement_vector;
 }
 
-void updateViewDirectionViaMouseReport(const mouse::MouseReport& mouse_report, pce::Orientation& orientation) {
-  const double direction_x_shift = pce::math::sign(mouse_report.x_position - mouse_report.prev_x_pos);
-  const double direction_y_shift = -pce::math::sign(mouse_report.y_position - mouse_report.prev_y_pos);
+
+bool updateViewDirectionViaMouseReport(const mouse::MouseReport& mouse_report, pce::Orientation& orientation) {
+  /* return true if mouse moved so that warp movement can be ignored */
+  // const double direction_x_shift = pce::math::sign(mouse_report.x_position - mouse_report.prev_x_pos);
+  // const double direction_y_shift = -pce::math::sign(mouse_report.y_position - mouse_report.prev_y_pos);
+  const double direction_x_shift = (mouse_report.x_position - mouse_report.prev_x_pos) / global_const::mouse_movement_smoother;
+  const double direction_y_shift = -(mouse_report.y_position - mouse_report.prev_y_pos) / global_const::mouse_movement_smoother;
   if (direction_x_shift != 0 || direction_y_shift != 0) {
     ezp::print_item("mouse moving");
     ezp::print_labeled_item("direction_x_shift", direction_x_shift);
     ezp::print_labeled_item("direction_y_shift", direction_y_shift);
-    rotateGazeLaterally(orientation, direction_x_shift);
-    rotateGazeVertically(orientation, direction_y_shift);
+    rotateGazeLaterally(orientation, direction_x_shift * global_const::mouse_sensitivity);
+    rotateGazeVertically(orientation, direction_y_shift * global_const::mouse_sensitivity);
+    SDL_WarpMouseInWindow(NULL, int(global_const::screen_x/2), int(global_const::screen_y/2));
+    return true;
   }
+  return false;
+
+  /* set mouse position to center of screen */
 }
 
 void updatePositionBasedOnJoystickReport(const JoystickReport& report,

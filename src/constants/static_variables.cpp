@@ -37,6 +37,10 @@ const double player_mass = 100.0; // kilos
 const double jump_velocity = 5.0; // meters per second jumping
 const double player_block_height = 1.0; // distance between camera and 'feet' 
 
+// player movement
+const double mouse_sensitivity = 1.0;
+const double mouse_movement_smoother = 20.0;
+
 }
 
 

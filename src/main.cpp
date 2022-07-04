@@ -31,6 +31,7 @@
 #include "ecs/systems/RadarSystem.cpp"
 #include "ecs/systems/MapBuilderSystem.cpp"
 #include "ecs/systems/BlockRenderSystem.cpp"
+#include "ecs/systems/ScreenMapSystem.cpp"
 
 /* factories */
 #include "ecs/entity_factories/BlockFactory.cpp"
@@ -116,11 +117,15 @@ int main(int argc, const char * argv[]) {
     block_render_sig.set(control.GetComponentType<pce::Radar>());
     control.SetSystemSignature<pce::BlockRenderSystem>(block_render_sig);
 
-
     auto map_builder_system = pce::MapBuilderSystem();
     map_builder_system.CreateMapArray();
-    Entity player = control.CreateEntity();
 
+    auto screen_map_system = control.RegisterSystem<pce::ScreenMapSystem>();
+    Signature screen_map_sig;
+    control.SetSystemSignature<pce::ScreenMapSystem>(screen_map_sig);
+
+
+    Entity player = control.CreateEntity();
     // glm::dvec3 start_position = glm::dvec3(-15, 20.6, 30);
     glm::dvec3 start_position = glm::dvec3(0, 20.6, 0);
     control.AddComponent(player, pce::Motion{
@@ -187,6 +192,7 @@ int main(int argc, const char * argv[]) {
                                                   cam_versor, cam_pos);
         radar_system->UpdateEntities();
         block_render_system->UpdateEntities(cam_transform_vector, cam_versor);
+        screen_map_system->UpdateEntities();
 
 
 
