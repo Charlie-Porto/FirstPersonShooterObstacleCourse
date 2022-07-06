@@ -19,8 +19,8 @@ const glm::dvec2 map_origin_cartesian = pce::convert::convertSDLCoordinatesToCar
 const glm::dvec2 map_transf_vec = map_origin_cartesian;
 
 void drawMapCenter() {
-  vezp::print_labeled_dvec2("map origin: ", map_origin);
-  vezp::print_labeled_dvec2("cartesian map origin: ", map_origin_cartesian);
+  // vezp::print_labeled_dvec2("map origin: ", map_origin);
+  // vezp::print_labeled_dvec2("cartesian map origin: ", map_origin_cartesian);
   pce::quickdraw::drawCircleAtRawVec2(map_origin, {255, 255, 255, 255}, 1.0);
 }
 

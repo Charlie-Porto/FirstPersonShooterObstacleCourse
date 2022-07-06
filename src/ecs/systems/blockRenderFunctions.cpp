@@ -14,9 +14,11 @@ free functions to assist the block render system
 #include <sign.cpp>
 #include <math_objects/Triangle.cpp>
 
+#include "subsystems/spacePixelConversionFunctions.cpp"
 #include "subsystems/simpleDrawingFunctions.cpp"
 #include "subsystems/squareDrawingFunctions.cpp"
 #include "../../SDL_core/simulation_manager.cpp"
+#include "../../constants/static_variables.cpp"
 
 
 namespace pce {

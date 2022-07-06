@@ -40,7 +40,7 @@ void UpdateEntities() {
 
     /* draw 2d-converted position on map */
     const glm::dvec2 map_position = pce::screen_map::convertActualCoordinatesToScreenMap(orientation.position);
-    vezp::print_labeled_dvec2("map_position", map_position);
+    // vezp::print_labeled_dvec2("map_position", map_position);
     pce::quickdraw::drawCircleAtVec2(map_position, {255, 255, 255, 255}, 1.0);
   }
 }

@@ -5,8 +5,9 @@
 #include <benchmark/benchmark.h>
 #include <ezprint.cpp>
 
-#include "functions_benchmarked/bmark_convertPointOnViewSphereToPixel.cpp"
-#include "functions_benchmarked/bmark_fastconvertPointOnViewSphereToPixel.cpp"
+// #include "functions_benchmarked/bmark_convertPointOnViewSphereToPixel.cpp"
+// #include "functions_benchmarked/bmark_fastconvertPointOnViewSphereToPixel.cpp"
+#include "functions_benchmarked/bmark_getBlockFaceVertices.cpp"
 
 // static void BM_test_funcA(benchmark::State& state) {
 //   for (auto _ : state) {

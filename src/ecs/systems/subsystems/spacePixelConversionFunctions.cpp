@@ -11,6 +11,7 @@ functions for converting 2d pixels to 3space
 #include <glm/vec3.hpp>
 #include <ezprint.cpp>
 #include <sign.cpp>
+#include "../../../constants/static_variables.cpp"
 
 namespace pce {
 namespace pix_map {

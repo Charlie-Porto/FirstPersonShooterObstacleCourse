@@ -18,23 +18,23 @@ public:
 
   void UpdateEntities(const glm::dvec3& transform_vector, const glm::dquat& versor) {
     // ezp::print_item("updating block render system");
+    // for (auto const& entity : entities) {
+    set<Entity>::iterator itr;
     for (auto const& entity : entities) {
-
-      /* the below if statement is just for deving */
-      // if (entity > 255 && entity < 257) {
-      // if (entity < 1278 && entity >1000) {
-      // ezp::print_item("*******");
-      // ezp::print_labeled_item("entity: ", entity);
-      auto const& position = control.GetComponent<pce::Position>(entity);
-      auto const& blockfaces = control.GetComponent<pce::OpenBlockFace>(entity);
+      // if (entity < 30) {
       auto const& radar = control.GetComponent<pce::Radar>(entity);
-
-      glm::dvec3 closest_vertex = pce::brend::getClosestVertexRelativePosition(position.rotated);
-      for (auto const& face : blockfaces.open_faces) {
-        pce::brend::renderCubeSide(position.actual, face, transform_vector, versor, 
-                                  radar.distance_from_player);
-          
+      auto const& neighbors = control.GetComponent<pce::Neighbors>(entity);      
+      
+      auto const neighbor_entities = neighbors.entities;
+      // ezp::print_item("-------------");
+      for (auto const& neighbor : neighbor_entities) {
+        // ezp::print_item(neighbor);
+        auto const& neighbor_radar = control.GetComponent<pce::Radar>(neighbor);
+        pce::quickdraw::drawLine(radar.hitpoint_corresponding_pixel, neighbor_radar.hitpoint_corresponding_pixel);
       }
+      // ezp::print_item("-------------");
+      
+      
 
       // } /* dev if backet */
 

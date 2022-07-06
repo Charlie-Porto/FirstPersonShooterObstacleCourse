@@ -23,10 +23,11 @@ public:
 void UpdateEntities(const glm::dvec3& transform_vector, const glm::dquat& versor,
                     const glm::dvec3& camera_position) {
   for (auto const entity : entities) {
+
+    /* update rotated position */
     auto& position = control.GetComponent<pce::Position>(entity);
     const glm::dvec3 transformed_position = position.actual - transform_vector;
     position.rotated = qfunc::rotateVector3byQuaternion(transformed_position, versor);
-
   }
   
 }

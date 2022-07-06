@@ -26,7 +26,7 @@ uint32_t getEntityByPositionFromMapArray(const glm::dvec3& position) {
 
 void calculateAirbornePosition(pce::Motion& motion, pce::Orientation& orientation, double time) {
   motion.time_airborne += time;
-  ezp::print_labeled_item("time airborne: ", motion.time_airborne);
+  // ezp::print_labeled_item("time airborne: ", motion.time_airborne);
   const double y_position_a = -9.81*(pow(motion.time_airborne, 2.0)) / 2.0;
   const double y_position_v = motion.initial_velocity.y * motion.time_airborne;
   const double new_y_position = y_position_a + y_position_v + motion.previous_ground_position.y;
@@ -69,7 +69,7 @@ void checkForMovementObstructions(pce::Orientation& orientation, pce::Motion& mo
 
     /* check for obstruction in x component of motion */
     const glm::dvec3 x_dir_index = MapBuilderSystem::origin_index_ - glm::dvec3(new_x, -(prev_y-2), prev_z-10.0);
-    vezp::print_labeled_dvec3("x index: ", x_dir_index);
+    // vezp::print_labeled_dvec3("x index: ", x_dir_index);
     if (x_dir_index.x < 0 || x_dir_index.x > pce::map_width_x) {
       orientation.position.x = orientation.previous_position.x; 
     } else if (MapBuilderSystem::map_array_.at(x_dir_index.x, x_dir_index.y, x_dir_index.z) > 0) {
@@ -94,7 +94,7 @@ void checkForMovementObstructions(pce::Orientation& orientation, pce::Motion& mo
   const glm::dvec3 motion_uvec = glm::normalize(motion.travel_direction);
   if (motion_uvec.x || motion_uvec.y || motion_uvec.z)  {
     motion.speed = sqrt(glm::dot(motion.travel_direction, motion.travel_direction));
-    ezp::print_labeled_item("speed: ", motion.speed);
+    // ezp::print_labeled_item("speed: ", motion.speed);
   } else {
     motion.speed = 0;
   }
