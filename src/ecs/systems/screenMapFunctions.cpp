@@ -25,8 +25,8 @@ void drawMapCenter() {
 }
 
 glm::dvec2 convertActualCoordinatesToScreenMap(const glm::dvec3& coordinates) {
-  auto const raw_xz_coordinates = glm::dvec2(coordinates.x, (coordinates.z - 10.0));
-  return glm::dvec2(raw_xz_coordinates * 1.7) + map_transf_vec;
+  auto const raw_xz_coordinates = -glm::dvec2(coordinates.x, (coordinates.z - 10.0));
+  return glm::dvec2(raw_xz_coordinates * 1.5) + map_transf_vec;
 }
 
 

@@ -37,3 +37,9 @@ Block Render
 - position
 - radar
 
+Weapon
+- joystick
+- orientation
+
+Weapon Render
+- radar

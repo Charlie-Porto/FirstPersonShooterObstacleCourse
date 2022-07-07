@@ -23,8 +23,8 @@ public:
   
   void Init() {
     camera_.position = glm::dvec3(0, 0, 0);
-    camera_.view_direction = normalize(glm::dvec3(0, -1, 1));
-    camera_.xz_angle = 0.0;
+    camera_.view_direction = normalize(glm::dvec3(0, -1, 2));
+    camera_.xz_angle = 180.0;
     camera_.y_angle = 0.0;
     camera_.rotation_versor = {1.0, 0.0, 0.0, 0.0};
     camera_.transformation_vector = {0, 0, 0};

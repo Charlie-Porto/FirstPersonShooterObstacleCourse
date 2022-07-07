@@ -26,20 +26,18 @@ uint32_t getEntityByPositionFromMapArray(const glm::dvec3& position) {
 
 void calculateAirbornePosition(pce::Motion& motion, pce::Orientation& orientation, double time) {
   motion.time_airborne += time;
-  // ezp::print_labeled_item("time airborne: ", motion.time_airborne);
+  ezp::print_labeled_item("time airborne: ", motion.time_airborne);
   const double y_position_a = -9.81*(pow(motion.time_airborne, 2.0)) / 2.0;
   const double y_position_v = motion.initial_velocity.y * motion.time_airborne;
   const double new_y_position = y_position_a + y_position_v + motion.previous_ground_position.y;
   
   const double x_position_v = motion.initial_velocity.x;
-  // double new_x_position = x_position_v + motion.previous_ground_position.x;
   double new_x_position = x_position_v + orientation.previous_position.x;
   if (new_x_position != new_x_position) {
     new_x_position = motion.previous_ground_position.x;
   }
 
   const double z_position_v = motion.initial_velocity.z;
-  // double new_z_position = z_position_v + motion.previous_ground_position.z;
   double new_z_position = z_position_v + orientation.previous_position.z;
   if (new_z_position != new_z_position) {
     new_z_position = motion.previous_ground_position.z;

@@ -18,9 +18,13 @@
 #include "ecs/components/position_component.cpp"
 #include "ecs/components/radar_component.cpp"
 #include "ecs/components/neighbors_component.cpp"
-#include "ecs/components/playerOnlyComponents/orientation_component.cpp"
-#include "ecs/components/playerOnlyComponents/motion_component.cpp"
-#include "ecs/components/playerOnlyComponents/joystick_component.cpp"
+#include "ecs/components/block_component.cpp"
+#include "ecs/components/orientation_component.cpp"
+#include "ecs/components/bullet_component.cpp"
+#include "ecs/components/entity_type_component.cpp"
+#include "ecs/components/motion_component.cpp"
+#include "ecs/components/joystick_component.cpp"
+#include "ecs/components/weapon_component.cpp"
 
 /* systems */
 #include "ecs/systems/PlayerMovementSystem.cpp"
@@ -32,6 +36,9 @@
 #include "ecs/systems/MapBuilderSystem.cpp"
 #include "ecs/systems/BlockRenderSystem.cpp"
 #include "ecs/systems/ScreenMapSystem.cpp"
+#include "ecs/systems/WeaponSystem.cpp"
+#include "ecs/systems/WeaponRenderSystem.cpp"
+#include "ecs/systems/BulletPositionSystem.cpp"
 
 /* factories */
 #include "ecs/entity_factories/BlockFactory.cpp"
@@ -73,6 +80,10 @@ int main(int argc, const char * argv[]) {
     control.RegisterComponent<pce::Motion>();
     control.RegisterComponent<pce::Joystick>();
     control.RegisterComponent<pce::Neighbors>();
+    control.RegisterComponent<pce::Weapon>();
+    control.RegisterComponent<pce::EntityType>();
+    control.RegisterComponent<pce::Block>();
+    control.RegisterComponent<pce::Bullet>();
 
 
     /* Register Systems */
@@ -90,8 +101,7 @@ int main(int argc, const char * argv[]) {
     control.SetSystemSignature<pce::PlayerMovementSystem>(player_mvmt_sig);
 
     auto physics_system = control.RegisterSystem<pce::PhysicsSystem>();
-    Signature physics_sig;
-    physics_sig.set(control.GetComponentType<pce::Motion>());
+    Signature physics_sig; physics_sig.set(control.GetComponentType<pce::Motion>());
     physics_sig.set(control.GetComponentType<pce::Orientation>());
     control.SetSystemSignature<pce::PhysicsSystem>(physics_sig);
 
@@ -109,23 +119,50 @@ int main(int argc, const char * argv[]) {
     Signature radar_sig;
     radar_sig.set(control.GetComponentType<pce::Position>());
     radar_sig.set(control.GetComponentType<pce::Radar>());
+    radar_sig.set(control.GetComponentType<pce::EntityType>());
     control.SetSystemSignature<pce::RadarSystem>(radar_sig);
 
     auto block_render_system = control.RegisterSystem<pce::BlockRenderSystem>();
     Signature block_render_sig;
     block_render_sig.set(control.GetComponentType<pce::Position>());
     block_render_sig.set(control.GetComponentType<pce::Radar>());
+    block_render_sig.set(control.GetComponentType<pce::Block>());
     control.SetSystemSignature<pce::BlockRenderSystem>(block_render_sig);
+
+    auto screen_map_system = control.RegisterSystem<pce::ScreenMapSystem>();
+    Signature screen_map_sig;
+    screen_map_sig.set(control.GetComponentType<pce::Orientation>());
+    screen_map_sig.set(control.GetComponentType<pce::Weapon>());
+    control.SetSystemSignature<pce::ScreenMapSystem>(screen_map_sig);
+
+    auto weapon_system = control.RegisterSystem<pce::WeaponSystem>();
+    Signature weapon_sig;
+    weapon_sig.set(control.GetComponentType<pce::Joystick>());
+    weapon_sig.set(control.GetComponentType<pce::Orientation>());
+    control.SetSystemSignature<pce::WeaponSystem>(weapon_sig);
+ 
+    auto weapon_render_system = control.RegisterSystem<pce::WeaponRenderSystem>();
+    Signature weapon_render_sig;
+    weapon_render_sig.set(control.GetComponentType<pce::Position>());
+    weapon_render_sig.set(control.GetComponentType<pce::Orientation>());
+    weapon_render_sig.set(control.GetComponentType<pce::Radar>());
+    control.SetSystemSignature<pce::WeaponRenderSystem>(weapon_render_sig);
+
+    auto bullet_position_system = control.RegisterSystem<pce::BulletPositionSystem>();
+    Signature bullet_position_sig;
+    bullet_position_sig.set(control.GetComponentType<pce::Position>());
+    bullet_position_sig.set(control.GetComponentType<pce::Orientation>());
+    bullet_position_sig.set(control.GetComponentType<pce::Motion>());
+    control.SetSystemSignature<pce::BulletPositionSystem>(bullet_position_sig);
+
+
+
 
     auto map_builder_system = pce::MapBuilderSystem();
     map_builder_system.CreateMapArray();
     map_builder_system.AssignEntityNeighbors();
     // map_builder_system.PrintMapArray();
 
-    auto screen_map_system = control.RegisterSystem<pce::ScreenMapSystem>();
-    Signature screen_map_sig;
-    screen_map_sig.set(control.GetComponentType<pce::Orientation>());
-    control.SetSystemSignature<pce::ScreenMapSystem>(screen_map_sig);
 
 
     Entity player = control.CreateEntity();
@@ -142,15 +179,14 @@ int main(int argc, const char * argv[]) {
         .in_flight_mode = false
     });
     control.AddComponent(player, pce::Orientation{
-        // .position = glm::dvec3(0, 1.6, 0),
         .position = start_position,
         .previous_position = start_position,
-        // .view_direction = glm::dvec3(0, 0, -1.0),
         .view_direction = glm::dvec3(0, 0, -1.0),
         .xz_view_angle = 180.0,
         .y_view_angle = 0.0
     });
     control.AddComponent(player, pce::Joystick{});
+    control.AddComponent(player, pce::Weapon{});
     
     /* Create Entities */
     // auto block_factory = pce::BlockFactory();
@@ -163,12 +199,9 @@ int main(int argc, const char * argv[]) {
         
         /* SDL events and updating */ 
         int frameStart = SDL_GetTicks();       
-        // auto* const handle_events = &simulation->handleEvents;
         simulation->handleEvents();
         simulation->update();
         simulation->clearRenderer();
-        // std::thread thread_b(&simulation->clearRenderer);
-        // thread_b.join();
         
 
         double t = frameStart/1000.0;
@@ -186,8 +219,9 @@ int main(int argc, const char * argv[]) {
         double ticks = (SDL_GetTicks()/1000.0);
         // joystick_system->UpdateEntities(ticks);
         std::thread thread_a([ticks, joystick_system, player_movement_system,
-                              physics_system, camera_system](){
+                              weapon_system, physics_system, camera_system](){
             joystick_system->UpdateEntities(ticks);
+            weapon_system->UpdateEntities();
             player_movement_system->UpdateEntities(ticks);
             physics_system->UpdateEntities(ticks);
             camera_system->UpdateCamera();
@@ -195,16 +229,25 @@ int main(int argc, const char * argv[]) {
 
         /*~~~~~~~~~-------------- Detect, Draw and Render --------------------*/
         std::thread thread_b([cam_versor, cam_pos, cam_transform_vector,
-                              position_transform_system, radar_system, block_render_system]() {
+                              position_transform_system, radar_system, block_render_system,
+                              weapon_render_system]() {
             position_transform_system->UpdateEntities(cam_transform_vector, cam_versor, cam_pos);
             radar_system->UpdateEntities();
             block_render_system->UpdateEntities(cam_transform_vector, cam_versor);
+            weapon_render_system->UpdateEntities();
         });
         thread_a.join();
         thread_b.join();
 
+        std::thread thread_bullet([bullet_position_system]() {
+            bullet_position_system->UpdateEntities();
+        });
+        std:thread thread_screen_map([screen_map_system]() {
+            screen_map_system->UpdateEntities();
+        });
 
-        screen_map_system->UpdateEntities();
+        thread_bullet.join();
+        thread_screen_map.join();
 
         /*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
         simulation->render();

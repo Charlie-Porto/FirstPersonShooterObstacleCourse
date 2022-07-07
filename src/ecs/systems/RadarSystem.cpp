@@ -34,13 +34,12 @@ void UpdateEntities() {
 
     radar.view_sphere_hitpoint = glm::normalize((position.rotated));
     radar.hitpoint_corresponding_pixel = -pce::pix_map::fastconvertPointOnViewSphereToPixel(
-    // radar.hitpoint_corresponding_pixel = -pce::pix_map::convertPointOnViewSphereToPixel(
       radar.view_sphere_hitpoint, glm::dvec3(0, 0, 0)
-    // );
     ) / global_const::pixel_squish_ratio;
-    radar.distance_from_player = glm::dot(position.rotated, position.rotated);
+    radar.distance_from_player = sqrt(glm::dot(position.rotated, position.rotated));
     
-    pce::quickdraw::drawPixelAtVec2(radar.hitpoint_corresponding_pixel, {100,200, 50, 255});
+    
+    // pce::quickdraw::drawPixelAtVec2(radar.hitpoint_corresponding_pixel, {170, 200, 50, 255});
 
 
    
